@@ -1,8 +1,9 @@
 __all__ = (
+    "gather",
     "create_task",
     "sleep",
-    "Lock",
     "run",
+    "Lock",
     "Coroutine",
     "EventLoop",
     "AbstractTask",
