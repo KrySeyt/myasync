@@ -40,6 +40,7 @@ python -m example_client
 
 # How to use
 - `Await` - socket with expected I/O type. Yield it from `Coroutine`
+- If `Coroutine` are not ready and it should be called later just `yield None` from coro. `sleep` and `Lock` works this way
 - Await `Coroutine` with `yield from`
 ```python
 import time
