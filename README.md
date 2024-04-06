@@ -1,2 +1,2 @@
 # MyAsync
-Simple async implementation in Python
+Simple implementation of asynchronous in Python
