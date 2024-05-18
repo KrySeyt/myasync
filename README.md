@@ -38,11 +38,25 @@ python -m example_server &
 python -m example_client 
 ```
 
-# How to use
+# Introducing
 - `Await` - socket with expected I/O type. Yield it from `Coroutine`
-- If `Coroutine` are not ready and it should be called later just `yield None` from coro. `sleep` and `Lock` works this way
 - Await `Coroutine` and `Task` with `yield from`
+- If `Coroutine` are not ready and it should be called later just `yield None` from coro. `sleep` and `Lock` works this way
+- If you wanna have async interface, but in current implementation nothing to `yield` or `yield from` (no sockets, no Coroutines and no Tasks), just `yield None`. Example:
 
+```python
+import myasync
+
+
+def io_operation(data: str) -> myasync.Coroutine[None]:
+    # Mock implementation
+    yield None
+    
+    print(f"Data: {data}")
+
+```
+
+# Code example
 ```python
 import time
 import socket

@@ -71,7 +71,7 @@ def gather(*awaitables: Coroutine[T_co] | AbstractTask[T_co]) -> TaskProxy[None]
     return create_task(gather_coro())
 
 
-def run(coro: Coroutine[T_co]) -> None:
-    coro_task = Task(coro)
-    loop.attach_task(coro_task)
+def run(coro_or_task: Coroutine[T_co] | AbstractTask[T_co]) -> None:
+    task = Task(coro_or_task) if not isinstance(coro_or_task, AbstractTask) else coro_or_task
+    loop.attach_task(task)
     loop.run()

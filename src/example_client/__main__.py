@@ -1,6 +1,5 @@
 import socket
 import time
-from collections.abc import Generator
 
 import myasync
 from myasync import (
@@ -22,7 +21,6 @@ def send_request() -> Coroutine[str]:
     sock.close()
 
     print("Task done")
-
     return "Done"
 
 
@@ -37,7 +35,7 @@ def main() -> Coroutine[None]:
     )
 
     end = time.time()
-    print(end - start)
+    print(f"Elapsed time: {end - start}")
 
 
 if __name__ == "__main__":
