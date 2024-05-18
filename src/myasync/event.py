@@ -1,4 +1,4 @@
-from myasync import Coroutine
+from myasync.loop import Coroutine
 
 
 class Event:

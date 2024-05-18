@@ -1,13 +1,13 @@
 import socket
 
-import myasync
+from myasync.loop import Coroutine, Await, IOType
 
 
-def send(conn: socket.socket, data: bytes) -> myasync.Coroutine[None]:
-    yield myasync.Await(conn, myasync.IOType.OUTPUT)
+def send(conn: socket.socket, data: bytes) -> Coroutine[None]:
+    yield Await(conn, IOType.OUTPUT)
     conn.send(data)
 
 
-def recv(conn: socket.socket, size: int) -> myasync.Coroutine[bytes]:
-    yield myasync.Await(conn, myasync.IOType.INPUT)
+def recv(conn: socket.socket, size: int) -> Coroutine[bytes]:
+    yield Await(conn, IOType.INPUT)
     return conn.recv(size)

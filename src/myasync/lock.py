@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from myasync import Coroutine
+from myasync.loop import Coroutine
 
 
 class Lock:
