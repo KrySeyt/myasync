@@ -14,3 +14,6 @@ class Event:
     def wait(self) -> Coroutine[None]:
         while not self._status:
             yield None
+
+    def __bool__(self) -> bool:
+        return self._status

@@ -65,13 +65,15 @@ class EventLoop:
             )
 
             for sock in ready_read:
-                for t in self._sock_to_tasks.pop(sock):
-                    self._tasks.put_nowait(t)
+                if sock in self._sock_to_tasks:
+                    for t in self._sock_to_tasks.pop(sock):
+                        self._tasks.put_nowait(t)
                 self._stopped_read.remove(sock)
 
             for sock in ready_write:
-                for t in self._sock_to_tasks.pop(sock):
-                    self._tasks.put_nowait(t)
+                if sock in self._sock_to_tasks:
+                    for t in self._sock_to_tasks.pop(sock):
+                        self._tasks.put_nowait(t)
                 self._stopped_write.remove(sock)
 
             for t in wait_tasks:

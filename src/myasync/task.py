@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TypeVar
 
-from myasync.loop import AbstractTask, Coroutine, Await
+from myasync.loop import AbstractTask, Await, Coroutine
 
 T_co = TypeVar("T_co", covariant=True)
 

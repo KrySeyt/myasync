@@ -1,6 +1,6 @@
 import socket
 
-from myasync.loop import Coroutine, Await, IOType
+from myasync.loop import Await, Coroutine, IOType
 
 
 def send(conn: socket.socket, data: bytes) -> Coroutine[None]:
