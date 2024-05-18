@@ -11,6 +11,8 @@ __all__ = (
     "TaskProxy",
     "IOType",
     "Await",
+    "send",
+    "recv",
 )
 
 import time
@@ -23,11 +25,15 @@ from myasync.loop import (
     EventLoop,
     IOType,
 )
-from myasync.selector import SelectSelector
 from myasync.task import (
     Task,
     TaskProxy,
 )
+from myasync.sockets import (
+    send,
+    recv,
+)
+from myasync.selector import SelectSelector
 from myasync.lock import Lock
 
 T_co = TypeVar("T_co", covariant=True)
