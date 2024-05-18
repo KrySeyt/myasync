@@ -1,10 +1,10 @@
 # MyAsync
-Simple implementation of asynchronous in Python
+My simple implementation of asynchronous in Python
 
 # Setup
 - Copy repo
 ```shell
-git clone git@github.com:KrySeyt/MyAsync.git
+git clone git@github.com:KrySeyt/MyAsync.gitПрпо
 ```
 
 - Create venv

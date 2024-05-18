@@ -54,7 +54,7 @@ version = "0.0.0"
 authors = [
     { name = "Sequew", email = "kryseyt@gmail.com" },
 ]
-description = "Chat with Clean Architecture, TDD and more"
+description = "My simple implementation of asynchronous in Python"
 requires-python = ">=3.11"
 [project.optional-dependencies]
 example = [
@@ -71,7 +71,7 @@ types-checking = [
 ]
 
 dev = [
-    "just_chat[lint, types-checking]",
+    "myasync[lint, types-checking, example]",
 ]
 
 [project.urls]
