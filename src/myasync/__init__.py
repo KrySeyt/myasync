@@ -16,11 +16,12 @@ __all__ = (
     "recv",
 )
 
+import concurrent.futures
 import multiprocessing
 import threading
 import time
-from collections.abc import Generator
-from typing import TypeVar, Callable, cast
+from collections.abc import Callable, Generator
+from typing import TypeVar, cast
 
 from myasync.events import Event
 from myasync.locks import Lock
@@ -41,8 +42,9 @@ from myasync.tasks import (
     TaskProxy,
 )
 
-
 T = TypeVar("T")
+
+Awaitable = Coroutine[T] | AbstractTask[T]
 
 
 def create_loop() -> EventLoop:
@@ -65,7 +67,7 @@ def create_task(coro: Coroutine[T]) -> TaskProxy[T]:
     return TaskProxy(coro_task)
 
 
-def gather(*awaitables: Coroutine[T] | AbstractTask[T]) -> TaskProxy[None]:
+def gather(*awaitables: Awaitable[T]) -> TaskProxy[None]:
     tasks = []
     for awaitable in awaitables:
         task = awaitable if isinstance(awaitable, AbstractTask) else create_task(awaitable)
@@ -80,7 +82,7 @@ def gather(*awaitables: Coroutine[T] | AbstractTask[T]) -> TaskProxy[None]:
     return create_task(gather_coro())
 
 
-def run(coro_or_task: Coroutine[T] | AbstractTask[T]) -> None:
+def run(coro_or_task: Awaitable[T]) -> None:
     task = Task(coro_or_task) if not isinstance(coro_or_task, AbstractTask) else coro_or_task
     loop.attach_task(task)
     loop.run()
@@ -101,21 +103,21 @@ def run_callable_in_thread(callable_: Callable[[], T]) -> Coroutine[T]:
     while not event.is_set():
         yield None
 
+    thread.join()
+
     result = cast(T, result)
 
     return result
 
 
-def run_coro_in_thread(coro_or_task: Coroutine[T] | AbstractTask[T]) -> Coroutine[T]:
-    task_ = coro_or_task if isinstance(coro_or_task, AbstractTask) else Task(coro_or_task)
+def run_awaitable_in_thread(awaitable: Awaitable[T]) -> Coroutine[T]:
+    task_ = awaitable if isinstance(awaitable, AbstractTask) else Task(awaitable)
     event = threading.Event()
-    result = None
-    another_loop = create_loop()
+    thread_loop = create_loop()
 
     def thread_task() -> None:
-        nonlocal result
-        another_loop.attach_task(task_)
-        another_loop.run()
+        thread_loop.attach_task(task_)
+        thread_loop.run()
         event.set()
 
     thread = threading.Thread(target=thread_task)
@@ -124,32 +126,16 @@ def run_coro_in_thread(coro_or_task: Coroutine[T] | AbstractTask[T]) -> Coroutin
     while not event.is_set():
         yield None
 
-    result = cast(T, result)
+    thread.join()
 
-    return result
+    return cast(T, task_.result)
 
 
-def run_in_thread(unit: Callable[[], T] | Coroutine[T] | AbstractTask[T]) -> Coroutine[T]:
+def run_in_thread(unit: Callable[[], T] | Awaitable[T]) -> Coroutine[T]:
     if callable(unit):
         return run_callable_in_thread(unit)
 
-    if isinstance(unit, Generator) or isinstance(unit, AbstractTask):
-        return run_coro_in_thread(unit)
+    if isinstance(unit, AbstractTask | Generator):
+        return run_awaitable_in_thread(unit)
 
-
-def run_callable_in_executor(callable_: Callable[[], T]) -> Coroutine[T]:
-    event = multiprocessing.Event()
-    result = None
-
-    def process_task(event) -> None:
-        nonlocal result
-        result = callable_()
-        event.set()
-
-    process = multiprocessing.Process(target=process_task, args=(event,))
-    process.start()
-
-    while not event.is_set():
-        yield None
-
-    return result
+    raise NotImplementedError(unit)
