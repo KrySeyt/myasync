@@ -57,6 +57,8 @@ loop = create_loop()
 def sleep(seconds: float = 0) -> Coroutine[None]:
     start_time = time.time()
 
+    yield None
+
     while start_time + seconds > time.time():
         yield None
 
