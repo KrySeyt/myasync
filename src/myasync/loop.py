@@ -7,8 +7,8 @@ from enum import Enum, auto
 from queue import SimpleQueue
 from typing import Any, Generic, TypeVar
 
-T_co = TypeVar("T_co", covariant=True)
-Coroutine = Generator["Await | None", None, T_co]
+T = TypeVar("T")
+Coroutine = Generator["Await | None", None, T]
 
 
 class IOType(Enum):
@@ -79,7 +79,7 @@ class EventLoop:
             for t in wait_tasks:
                 self._tasks.put_nowait(t)
 
-    def attach_task(self, task: AbstractTask[T_co]) -> None:
+    def attach_task(self, task: AbstractTask[T]) -> None:
         self._tasks.put_nowait(task)
 
 
@@ -94,6 +94,9 @@ class Selector(ABC):
         list[socket.socket],
     ]:
         raise NotImplementedError
+
+
+T_co = TypeVar("T_co", covariant=True)
 
 
 class AbstractTask(ABC, Generic[T_co]):
