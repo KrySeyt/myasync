@@ -19,6 +19,7 @@ __all__ = (
 import multiprocessing
 import threading
 import time
+from collections.abc import Generator
 from typing import TypeVar, Callable, cast
 
 from myasync.events import Event
@@ -43,7 +44,12 @@ from myasync.tasks import (
 
 T = TypeVar("T")
 
-loop = EventLoop(SelectSelector())
+
+def create_loop() -> EventLoop:
+    return EventLoop(SelectSelector())
+
+
+loop = create_loop()
 
 
 def sleep(seconds: float = 0) -> Coroutine[None]:
@@ -80,7 +86,7 @@ def run(coro_or_task: Coroutine[T] | AbstractTask[T]) -> None:
     loop.run()
 
 
-def run_in_thread(callable_: Callable[[], T]) -> Coroutine[T]:
+def run_callable_in_thread(callable_: Callable[[], T]) -> Coroutine[T]:
     event = threading.Event()
     result = None
 
@@ -100,7 +106,38 @@ def run_in_thread(callable_: Callable[[], T]) -> Coroutine[T]:
     return result
 
 
-def run_in_executor(callable_: Callable[[], T]) -> Coroutine[T]:
+def run_coro_in_thread(coro_or_task: Coroutine[T] | AbstractTask[T]) -> Coroutine[T]:
+    task_ = coro_or_task if isinstance(coro_or_task, AbstractTask) else Task(coro_or_task)
+    event = threading.Event()
+    result = None
+    another_loop = create_loop()
+
+    def thread_task() -> None:
+        nonlocal result
+        another_loop.attach_task(task_)
+        another_loop.run()
+        event.set()
+
+    thread = threading.Thread(target=thread_task)
+    thread.start()
+
+    while not event.is_set():
+        yield None
+
+    result = cast(T, result)
+
+    return result
+
+
+def run_in_thread(unit: Callable[[], T] | Coroutine[T] | AbstractTask[T]) -> Coroutine[T]:
+    if callable(unit):
+        return run_callable_in_thread(unit)
+
+    if isinstance(unit, Generator) or isinstance(unit, AbstractTask):
+        return run_coro_in_thread(unit)
+
+
+def run_callable_in_executor(callable_: Callable[[], T]) -> Coroutine[T]:
     event = multiprocessing.Event()
     result = None
 
