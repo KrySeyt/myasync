@@ -16,9 +16,10 @@ __all__ = (
     "recv",
 )
 
+import multiprocessing
 import threading
 import time
-from typing import TypeVar, Callable
+from typing import TypeVar, Callable, cast
 
 from myasync.events import Event
 from myasync.locks import Lock
@@ -79,17 +80,37 @@ def run(coro_or_task: Coroutine[T] | AbstractTask[T]) -> None:
     loop.run()
 
 
-def run_in_thread(callable_: Callable[[], T]) -> TaskProxy[T]:
+def run_in_thread(callable_: Callable[[], T]) -> Coroutine[T]:
     event = threading.Event()
     result = None
 
-    def thread_task():
+    def thread_task() -> None:
         nonlocal result
         result = callable_()
         event.set()
 
     thread = threading.Thread(target=thread_task)
     thread.start()
+
+    while not event.is_set():
+        yield None
+
+    result = cast(T, result)
+
+    return result
+
+
+def run_in_executor(callable_: Callable[[], T]) -> Coroutine[T]:
+    event = multiprocessing.Event()
+    result = None
+
+    def process_task(event) -> None:
+        nonlocal result
+        result = callable_()
+        event.set()
+
+    process = multiprocessing.Process(target=process_task, args=(event,))
+    process.start()
 
     while not event.is_set():
         yield None
