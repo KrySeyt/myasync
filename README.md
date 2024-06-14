@@ -48,13 +48,11 @@ python -m example_client
 ```python
 import myasync
 
-
 def io_operation(data: str) -> myasync.Coroutine[None]:
     # Mock implementation
     yield None
     
     print(f"Data: {data}")
-
 ```
 
 # Code example
