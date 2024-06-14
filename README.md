@@ -4,7 +4,7 @@ My simple implementation of asynchronous in Python
 # Setup
 - Copy repo
 ```shell
-git clone git@github.com:KrySeyt/MyAsync.gitПрпо
+git clone git@github.com:KrySeyt/MyAsync.git
 ```
 
 - Create venv
