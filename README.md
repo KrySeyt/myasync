@@ -9,7 +9,7 @@ python -m venv .venv
 
 - Activate venv
 ```shell
-. ./.venv/bin/activate 
+. .venv/bin/activate 
 ```
 
 - Install `myasync`
