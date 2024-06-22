@@ -2,11 +2,6 @@
 My simple implementation of asynchronous in Python
 
 # Setup
-- Copy repo
-```shell
-git clone git@github.com:KrySeyt/MyAsync.git
-```
-
 - Create venv
 ```shell
 python -m venv .venv 
@@ -19,13 +14,13 @@ python -m venv .venv
 
 - Install `myasync`
 ```shell
-pip install ./MyAsync
+pip install myredis-py@git+https://github.com/KrySeyt/myasync.git
 ```
 
 # Run example
 - Install `myasync` with example
 ```shell
-pip install ./MyAsync\[example]
+pip install myredis-py@git+https://github.com/KrySeyt/myasync.git
 ```
 
 - Run example server
